@@ -9,34 +9,41 @@ var striptags = require('strip');
 //lodash (non-es6)
 var _ = require('lodash');
 
-//search for months
-var search = [];
-
-//toss out unreasonable dates
-var dateFilter = function (blockText) {
-  var re = /(19\d\d,)|(20\d\d,)/ig;
-  var dates = blockText.match(re);
-  return dates.sort();
+//get all the sentences
+var getSentences = function (text) {
+  return text.split('.');
 }
 
-//get sentence surrounding each date
-var getDateSentences = function (dates, text) {
-  console.log('here');
+//process each sentence that contains a date
+var processSentences = function (sentences) {
   var res = [];
-  _.forEach(dates, function (d) {
-    console.log(d);
-    var re = new RegExp('(\..*' + d + '.*\. )');
-    console.log(re);
-    var find = text.match(re);
-    console.log(find);
-    res.push(find);
+  var re = /(19\d\d)|(20\d\d)/ig;
+  var pickDate = /(19\d\d)|(20\d\d)/ig;
+  _.forEach(sentences, function (s) {
+    if(re.test(s)) {
+      var date = s.match(pickDate);
+      var sen = s.replace(/\[\d*\]/, '');//strip wikipedia annotations
+      var sen = s.replace(/\n/, '');//strip newlines
+      res.push({
+        date: date,
+        sentence: s
+      });
+    }
+  });
+  return _.sortBy(res, 'date');
+}
+
+var formatSentences = function (sentences) {
+  var res = [];
+  _.forEach(sentences, function (s) {
+    res.push(s.date + ',' + s.sentence);
   });
   return res;
 }
 
 //output file
 var writeArrayToFile = function (array) {
-  var path = 'output.txt';
+  var path = 'output.csv';
   var content = '';
   _.forEach(array, function (data) {
     content = content + data + '\n';
@@ -58,14 +65,15 @@ if(args.length == 2) {
       //var strip = striptags(blockText).replace(/\s/ig, '');
       var block = striptags(content).toLowerCase();
       //strip is block of source
-      var dates = dateFilter(block);
-      var sentences = getDateSentences(dates, block);
+      var sentences = getSentences(block);
+      var dateSentences = processSentences(sentences);
+      console.log(dateSentences.length);
 
       //output results
-      _.forEach(sentences, function (d) {
-        //console.log(d);
+      _.forEach(dateSentences, function (d) {
+        //console.log(d.date);
       });
-      //writeArrayToFile(sentences);
+      writeArrayToFile(formatSentences(dateSentences));
       console.log('Done');
     }
     phantom.exit();
