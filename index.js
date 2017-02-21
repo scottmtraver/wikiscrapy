@@ -22,10 +22,9 @@ var processSentences = function (sentences) {
   _.forEach(sentences, function (s) {
     if(re.test(s)) {
       var date = s.match(pickDate);
-      var sen = s.replace(/\[\d*\]/, '');//strip wikipedia annotations
-      sen = sen.replace(/\n/, '');//strip newlines
+      var sen = s.replace(/\[\d*]/g, '');//strip wikipedia annotations
+      sen = sen.replace('\n', '');//strip newlines
       sen = sen.replace(',', '');//strip commas for file formatting
-      console.log(sen);
       res.push({
         date: date,
         sentence: sen
@@ -40,6 +39,7 @@ var formatSentences = function (sentences) {
   _.forEach(sentences, function (s) {
     res.push(s.date + ',' + s.sentence);
   });
+  console.log(res);
   return res;
 }
 
@@ -66,7 +66,6 @@ if(args.length == 2) {
       var content = page.evaluate(function() {
         return $('#mw-content-text p').text();//wikipedia specific selectors
       });
-      console.log(content);
       var block = striptags(content).toLowerCase();
       //strip is block of source
       var sentences = getSentences(block);
