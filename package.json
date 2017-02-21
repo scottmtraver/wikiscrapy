@@ -1,0 +1,19 @@
+{
+  "name": "scrapy",
+  "version": "1.0.0",
+  "description": "PhantomJS web searcher for regex",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Scott Traver",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "lodash": "^4.17.4",
+    "phantomjs-prebuilt": "*",
+    "strip": "^3.0.0",
+    "system": "^1.2.0",
+    "webpage": "^0.3.0"
+  }
+}
