@@ -23,10 +23,12 @@ var processSentences = function (sentences) {
     if(re.test(s)) {
       var date = s.match(pickDate);
       var sen = s.replace(/\[\d*\]/, '');//strip wikipedia annotations
-      var sen = s.replace(/\n/, '');//strip newlines
+      sen = sen.replace(/\n/, '');//strip newlines
+      sen = sen.replace(',', '');//strip commas for file formatting
+      console.log(sen);
       res.push({
         date: date,
-        sentence: s
+        sentence: sen
       });
     }
   });
@@ -61,18 +63,15 @@ if(args.length == 2) {
       console.log('Unable to access network');
     } else {
       //program
-      var content = page.content;
-      //var strip = striptags(blockText).replace(/\s/ig, '');
+      var content = page.evaluate(function() {
+        return $('#mw-content-text p').text();//wikipedia specific selectors
+      });
+      console.log(content);
       var block = striptags(content).toLowerCase();
       //strip is block of source
       var sentences = getSentences(block);
       var dateSentences = processSentences(sentences);
-      console.log(dateSentences.length);
 
-      //output results
-      _.forEach(dateSentences, function (d) {
-        //console.log(d.date);
-      });
       writeArrayToFile(formatSentences(dateSentences));
       console.log('Done');
     }
